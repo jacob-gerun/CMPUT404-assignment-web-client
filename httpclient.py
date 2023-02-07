@@ -90,7 +90,7 @@ class HTTPClient(object):
         print('Path:', path)
         print('Os Name:', os.name)
         print("platform:", platform.system())
-        self.sendall(f"GET {path} HTTP/1.1\nHost: {host}\nUser-Agent:{platform.system()}\nConnection: close\n\n")
+        self.sendall(f"GET {path} HTTP/1.1\r\nHost: {host}\r\nUser-Agent: Linux\r\nConnection: close\r\n\r\n")
         recv = self.recvall(self.socket)
         print('recv', recv)
         print(urllib.parse.urlparse(url))
@@ -108,7 +108,7 @@ class HTTPClient(object):
         print('args: ',args)
         code = 500
         body = ""
-        self.close()
+        #self.close()
         return HTTPResponse(code, body)
 
     def command(self, url, command="GET", args=None):
