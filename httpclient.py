@@ -41,12 +41,15 @@ class HTTPClient(object):
         return None
 
     def get_code(self, data):
+        print('get_code: ',data)
         return None
 
     def get_headers(self,data):
+        print('get_headers: ',data)
         return None
 
     def get_body(self, data):
+        print('get_body: ',data)
         return None
     
     def sendall(self, data):
@@ -68,11 +71,32 @@ class HTTPClient(object):
         return buffer.decode('utf-8')
 
     def GET(self, url, args=None):
+        print('In GET')
         code = 500
         body = ""
+        parsedURL = urllib.parse.urlparse(url)
+        host = parsedURL.hostname
+        port = parsedURL.port if parsedURL.port else 80
+        self.connect(host, port)
+        path = parsedURL.path if parsedURL.path else "/"
+        print('Host:', host)
+        print('Port:', port)
+        print('Path:', path)
+        self.sendall(f"GET {path}\n Host: {host}\n\n")
+        recv = self.recvall(self.socket)
+        print('recv', recv)
+        print(urllib.parse.urlparse(url))
+        print('url: ',url)
+        print('args: ',args)
+        print('data check')
+        
         return HTTPResponse(code, body)
 
     def POST(self, url, args=None):
+        print('POST')
+        print(urllib.parse.urlparse(url))
+        print('url: ',url)
+        print('args: ',args)
         code = 500
         body = ""
         return HTTPResponse(code, body)
