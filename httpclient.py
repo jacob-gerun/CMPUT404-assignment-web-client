@@ -21,6 +21,8 @@
 import sys
 import socket
 import re
+import os
+import platform
 # you may use urllib to encode data appropriately
 import urllib.parse
 
@@ -41,16 +43,20 @@ class HTTPClient(object):
         return None
 
     def get_code(self, data):
-        print('get_code: ',data)
-        return None
+        #return None
+        print("In get code")
+        print(data.split(' '))
+        #print(data.split(' ')[0].split(' ')[1])
+        return int(data.split(' ')[1])
 
     def get_headers(self,data):
         print('get_headers: ',data)
         return None
 
     def get_body(self, data):
-        print('get_body: ',data)
-        return None
+        print('get_body: ',repr(data))
+        print(data.split('\r\n\r\n')[1])
+        return data.split('\r\n\r\n')[1]
     
     def sendall(self, data):
         self.socket.sendall(data.encode('utf-8'))
@@ -82,15 +88,18 @@ class HTTPClient(object):
         print('Host:', host)
         print('Port:', port)
         print('Path:', path)
-        self.sendall(f"GET {path}\n Host: {host}\n\n")
+        print('Os Name:', os.name)
+        print("platform:", platform.system())
+        self.sendall(f"GET {path} HTTP/1.1\nHost: {host}\nUser-Agent:{platform.system()}\nConnection: close\n\n")
         recv = self.recvall(self.socket)
         print('recv', recv)
         print(urllib.parse.urlparse(url))
         print('url: ',url)
         print('args: ',args)
-        print('data check')
-        
-        return HTTPResponse(code, body)
+        print('get code:',self.get_code(recv))
+        print('get body:',self.get_body(recv))
+        self.close()
+        return HTTPResponse(self.get_code(recv), self.get_body(recv))
 
     def POST(self, url, args=None):
         print('POST')
@@ -99,6 +108,7 @@ class HTTPClient(object):
         print('args: ',args)
         code = 500
         body = ""
+        self.close()
         return HTTPResponse(code, body)
 
     def command(self, url, command="GET", args=None):
