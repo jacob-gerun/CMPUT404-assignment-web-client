@@ -44,18 +44,18 @@ class HTTPClient(object):
 
     def get_code(self, data):
         #return None
-        print("In get code")
-        print(data.split(' '))
+        #print("In get code")
+        #print(data.split(' '))
         #print(data.split(' ')[0].split(' ')[1])
         return int(data.split(' ')[1])
 
     def get_headers(self,data):
-        print('get_headers: ',data)
+        #print('get_headers: ',data)
         return None
 
     def get_body(self, data):
-        print('get_body: ',repr(data))
-        print(data.split('\r\n\r\n')[1])
+        #print('get_body: ',repr(data))
+        #print(data.split('\r\n\r\n')[1])
         return data.split('\r\n\r\n')[1]
     
     def sendall(self, data):
@@ -77,7 +77,9 @@ class HTTPClient(object):
         return buffer.decode('utf-8')
 
     def GET(self, url, args=None):
-        print('In GET')
+        #print('In GET')
+        #print("VERSION")
+        #print(sys.version)
         code = 500
         body = ""
         parsedURL = urllib.parse.urlparse(url)
@@ -85,24 +87,27 @@ class HTTPClient(object):
         port = parsedURL.port if parsedURL.port else 80
         self.connect(host, port)
         path = parsedURL.path if parsedURL.path else "/"
-        print('Host:', host)
-        print('Port:', port)
-        print('Path:', path)
-        print('Os Name:', os.name)
-        print("platform:", platform.system())
-        self.sendall(f"GET {path} HTTP/1.1\r\nHost: {host}\r\nUser-Agent: {platform.system()}\r\nConnection: close\r\n\r\n")
+        # print('Host:', host)
+        # print('Port:', port)
+        # print('Path:', path)
+        # print('Os Name:', os.name)
+        # print("platform:", platform.system())
+        if args:
+            self.sendall(f"GET {path}?{urllib.parse.urlencode(args)} HTTP/1.1\r\nHost: {host}\r\nUser-Agent: {platform.system()}\r\nConnection: close\r\n\r\n")
+        else:
+            self.sendall(f"GET {path} HTTP/1.1\r\nHost: {host}\r\nUser-Agent: {platform.system()}\r\nConnection: close\r\n\r\n")
         recv = self.recvall(self.socket)
-        print('recv', recv)
-        print(urllib.parse.urlparse(url))
-        print('url: ',url)
-        print('args: ',args)
-        print('get code:',self.get_code(recv))
-        print('get body:',self.get_body(recv))
+        # print('recv', recv)
+        # print(urllib.parse.urlparse(url))
+        # print('url: ',url)
+        # print('args: ',args)
+        # print('get code:',self.get_code(recv))
+        # print('get body:',self.get_body(recv))
         self.close()
         return HTTPResponse(self.get_code(recv), self.get_body(recv))
 
     def POST(self, url, args=None):
-        print('POST')
+        # print('POST')
         parsedURL = urllib.parse.urlparse(url)
         host = parsedURL.hostname
         port = parsedURL.port if parsedURL.port else 80
@@ -110,7 +115,7 @@ class HTTPClient(object):
         path = parsedURL.path if parsedURL.path else "/"
         if args:
             body = urllib.parse.urlencode(args)
-            print(body)
+            # print('PARSED ARGS',body)
             self.sendall(f"POST {path} HTTP/1.1\r\nHost: {host}\r\nUser-Agent: {platform.system()}\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: {len(body)}\r\nConnection: close\r\n\r\n{body}\r\n\r\n")
         else:
             self.sendall(f"POST {path} HTTP/1.1\r\nHost: {host}\r\nUser-Agent: {platform.system()}\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: 0\r\nConnection: close\r\n\r\n")
